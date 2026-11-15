@@ -30,15 +30,40 @@ Publishing is deliberately manual. No changesets, no provenance automation.
 The engine was renamed from the scoped `@leonard-memento/core` to the
 unscoped `agent-memento` (npm name verified free: registry 404, zero
 download history). Adapter names never change. Old versions get removed,
-not deprecated, because nobody depends on the family yet:
+not deprecated, because nobody depends on the family yet — and once the
+engine is gone, old adapter versions would be uninstallable anyway
+(their dependency would 404).
+
+Migration is single-day. The ordering does all the work:
+
+- **Engine before adapters** — `npm publish` resolves dependencies, so
+  `agent-memento@1.3.0` must exist before adapters 1.3.0 are uploaded.
+- **1.3.0 before the old adapter versions are removed** — a package name
+  only enters npm's 24-hour block when its LAST version disappears.
+  With 1.3.0 already published, unpublishing old adapter versions never
+  empties the name, so no waiting day.
+- **Old adapter versions before the engine** — npm refuses to unpublish
+  a package that still has dependents, and the old adapter versions
+  depend on `@leonard-memento/core`.
+
+Steps:
 
 1. Requires npm auth: `npm whoami` must succeed (`NPM_TOKEN` / `npm login`).
-2. Rename the GitHub repo `leonard-memento` → `agent-memento` first; the
-   name is free for this owner (an old rename redirect to this same repo
-   is consumed by the rename). yangwenyu2/agent-memento (unrelated
-   project) exists but GitHub names are unique per owner.
-3. Unpublish dependent versions before the versions they depend on —
-   npm refuses to unpublish a package that has dependents:
+2. GitHub repo renamed `leonard-memento` → `agent-memento` (done 2026-11-15;
+   the old rename redirect to this same repo is consumed by the rename).
+   yangwenyu2/agent-memento (unrelated project) exists but GitHub names
+   are unique per owner.
+3. Publish the new family — engine first, then adapters (per release
+   checklist steps 3–5):
+   ```
+   npm publish -w packages/core        # agent-memento@1.3.0
+   npm publish -w packages/opencode    # opencode-memento@1.3.0
+   npm publish -w packages/claude-code # claude-code-memento@1.3.0
+   npm publish -w packages/codex       # codex-memento@1.3.0
+   git tag v1.3.0 && git push origin v1.3.0
+   ```
+4. Unpublish the old ADAPTER versions (each: >72h since publish, <300
+   downloads/week, single owner, no dependents — none apply):
    ```
    npm unpublish opencode-memento@1.2.1 --force
    npm unpublish opencode-memento@1.1.0 --force
@@ -47,20 +72,17 @@ not deprecated, because nobody depends on the family yet:
    npm unpublish claude-code-memento@0.1.0 --force
    npm unpublish codex-memento@0.2.1 --force
    npm unpublish codex-memento@0.1.0 --force
+   ```
+5. Unpublish the engine — its dependents are gone after step 4. Both
+   versions are its only versions, so the `@leonard-memento/core` name
+   enters the 24-hour block afterwards; irrelevant, the name is abandoned.
+   ```
    npm unpublish @leonard-memento/core@0.2.1 --force
    npm unpublish @leonard-memento/core@0.1.0 --force
    ```
-   Preconditions per version (npm policy, >72h after publish): no
-   dependents (step 3 order guarantees it), <300 downloads/week (the
-   family never crossed ~250/month), single owner.
-4. Unpublishing ALL versions of a name blocks that name on npm for 24
-   hours. The adapters keep their names and their version numbers were
-   never at 1.3.0, so publish the new family the NEXT day:
-   agent-memento@1.3.0, opencode-memento@1.3.0, claude-code-memento@1.3.0,
-   codex-memento@1.3.0 — per the Per release checklist above.
-5. Archive `github.com/NemeZZiZZ/opencode-memento` (the v1.0.0
+6. Archive `github.com/NemeZZiZZ/opencode-memento` (the v1.0.0
    predecessor repo, already archived) with a banner README pointing at
    this repo under its new name. Unpublished npm versions cannot be
    reinstalled — `npx @leonard-memento/core` stops working by design.
-6. Optional smoke test: `/plugin install NemeZZiZZ/agent-memento` in a real
+7. Optional smoke test: `/plugin install NemeZZiZZ/agent-memento` in a real
    Claude Code session, run `/compact`, confirm the index block reappears.
