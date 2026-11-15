@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { projectHash, readProjectIndex } from "@leonard-memento/core";
+import { projectHash, readProjectIndex } from "agent-memento";
 import { buildHookOutput, runHook } from "../src/hook.mjs";
 
 const CLI = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));

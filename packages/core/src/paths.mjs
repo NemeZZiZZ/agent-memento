@@ -1,4 +1,4 @@
-// @leonard-memento/core — path canonicalization and project hashing.
+// agent-memento — path canonicalization and project hashing.
 //
 // Ported verbatim from opencode-memento v1.0.0 (`src/index.ts` lines 37–50):
 // the project hash must stay identical so existing memory trees keep resolving.

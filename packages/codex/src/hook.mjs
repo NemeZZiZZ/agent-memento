@@ -7,7 +7,7 @@
 // Failure policy: never write anything but the JSON reply, never exit
 // non-zero — a hook must not break the session it runs in.
 
-import { readProjectIndex } from "@leonard-memento/core";
+import { readProjectIndex } from "agent-memento";
 
 /**
  * Pure decision: SessionStart payload in, hook output (or null) out.

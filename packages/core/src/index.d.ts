@@ -1,4 +1,4 @@
-// Public API types for @leonard-memento/core (hand-written; the package is
+// Public API types for agent-memento (hand-written; the package is
 // plain ESM .mjs with JSDoc — this file is for TypeScript consumers).
 
 /** Resolve symlinks (like `pwd -P`) and drop trailing slashes (POSIX and Windows). */

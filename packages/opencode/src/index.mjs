@@ -24,7 +24,7 @@
 // (agent-facing instructions) when the project has none — clean installs
 // become usable with zero terminal steps. Create-only, never overwrites.
 
-import { readProjectIndex, bootstrapProjectIndex } from "@leonard-memento/core";
+import { readProjectIndex, bootstrapProjectIndex } from "agent-memento";
 
 /**
  * @typedef {Object} MementoOptions

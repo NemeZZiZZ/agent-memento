@@ -1,4 +1,4 @@
-// @leonard-memento/core — bidirectional sync with Claude Code auto memory.
+// agent-memento — bidirectional sync with Claude Code auto memory.
 //
 // Claude Code maintains `~/.claude/projects/<project>/memory/` (MEMORY.md
 // index + one Markdown topic file per fact) but loads it only at session

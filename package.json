@@ -1,5 +1,5 @@
 {
-  "name": "leonard-memento-repo",
+  "name": "agent-memento-repo",
   "private": true,
   "license": "MIT",
   "author": "NemezziZZ",
@@ -7,5 +7,5 @@
   "workspaces": ["packages/*"],
   "engines": { "node": ">=20" },
   "scripts": { "test": "node --test" },
-  "repository": { "type": "git", "url": "git+https://github.com/NemeZZiZZ/leonard-memento.git" }
+  "repository": { "type": "git", "url": "git+https://github.com/NemeZZiZZ/agent-memento.git" }
 }

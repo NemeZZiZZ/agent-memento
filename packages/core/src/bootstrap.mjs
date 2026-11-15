@@ -1,4 +1,4 @@
-// @leonard-memento/core — one-time starter skeleton for clean installs.
+// agent-memento — one-time starter skeleton for clean installs.
 //
 // A project with no memory tree yet gets a starter MEMORY.md the first
 // time the plugin (or `memento init`) loads in it, so the index

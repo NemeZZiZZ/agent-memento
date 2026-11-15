@@ -1,4 +1,4 @@
-// @leonard-memento/core — reading the project memory index for injection.
+// agent-memento — reading the project memory index for injection.
 //
 // The block format is FROZEN: byte-identical to opencode-memento v1.0.0
 // (`src/index.ts` lines 70–91). Do not reformat.

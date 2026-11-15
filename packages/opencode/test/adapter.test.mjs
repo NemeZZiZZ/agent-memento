@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { projectHash, readProjectIndex } from "@leonard-memento/core";
+import { projectHash, readProjectIndex } from "agent-memento";
 import plugin from "../src/index.mjs";
 import * as adapter from "../src/index.mjs";
 

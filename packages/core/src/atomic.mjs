@@ -1,4 +1,4 @@
-// @leonard-memento/core — crash-safe file replacement.
+// agent-memento — crash-safe file replacement.
 //
 // Plain writeFileSync truncates the target first: a process dying mid-write
 // destroys the whole file (the user's AGENTS.md, settings.json, MEMORY.md).
