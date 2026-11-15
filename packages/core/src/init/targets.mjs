@@ -116,9 +116,12 @@ export const TARGETS = {
   },
   opencode: {
     kind: "print",
+    // One-time starter memory index: the plugin self-bootstraps too; the
+    // CLI path creates the tree so `init` alone leaves a working setup.
+    bootstrap: true,
     snippet: () =>
       'Add to opencode.json (OpenCode 1.x):\n\n  "plugin": ["npm:opencode-memento"]\n\nOpenCode 2.x ignores project-level plugin config — install globally instead:\n\n  opencode plugin add opencode-memento',
-    hint: "Restart OpenCode — the plugin injects the index at every compaction.",
+    hint: "Starter memory index created if missing. Restart OpenCode — the plugin injects the index at every compaction.",
   },
   aider: {
     kind: "print",

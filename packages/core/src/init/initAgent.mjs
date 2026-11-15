@@ -4,11 +4,14 @@
 // over the target, so an interrupted run leaves either the old or the new
 // file — never a truncated one. Markers make init idempotent: re-runs
 // replace the marked block. Nothing outside the markers is ever modified.
+// Agents flagged `bootstrap: true` additionally get a one-time starter
+// memory index created (never overwritten) in the memory tree.
 
 import { accessSync, constants, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname } from "node:path";
 
 import { writeAtomicSync } from "../atomic.mjs";
+import { bootstrapProjectIndex } from "../bootstrap.mjs";
 import { MARKER_BEGIN, MARKER_END, TARGETS } from "./targets.mjs";
 
 export class MementoError extends Error {
@@ -50,6 +53,15 @@ export function initAgent(projectDir, agent) {
   const target = TARGETS[agent];
   if (!target) {
     throw new MementoError(`unknown agent '${agent}' — see 'memento init --list'`, "UNKNOWN_AGENT");
+  }
+  if (target.bootstrap) {
+    // CLI errors should be actionable, not swallowed: a bootstrap failure
+    // (bad root, permissions) surfaces as MementoError with the cause.
+    try {
+      bootstrapProjectIndex(projectDir);
+    } catch (err) {
+      throw new MementoError(`could not create starter memory index: ${err.message}`, "BOOTSTRAP_FAILED");
+    }
   }
   if (target.kind === "text") {
     const file = target.file(projectDir);

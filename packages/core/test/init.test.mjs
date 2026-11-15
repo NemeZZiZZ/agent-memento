@@ -139,6 +139,24 @@ test("unknown agent exits 2", async () => {
   assert.ok(r.stderr.length > 0);
 });
 
+test("init opencode bootstraps the starter index", () =>
+  withTempRoot((memoryRoot) => {
+    const project = tempProject();
+    const r = initAgent(project, "opencode");
+    assert.equal(r.status, "printed");
+    assert.equal(existsSync(memoryIndexPath(project, { memoryRoot })), true);
+  }));
+
+test("init opencode is idempotent and never overwrites", () =>
+  withTempRoot((memoryRoot) => {
+    const project = tempProject();
+    initAgent(project, "opencode");
+    const indexPath = memoryIndexPath(project, { memoryRoot });
+    writeFileSync(indexPath, "- [[kept]] — user content\n");
+    initAgent(project, "opencode");
+    assert.equal(readFileSync(indexPath, "utf8"), "- [[kept]] — user content\n");
+  }));
+
 // --- N7/N9: atomic writes + unpaired markers + crush hint ---
 
 import { readdirSync } from "node:fs";

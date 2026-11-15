@@ -128,7 +128,10 @@ test("aborts on invalid JSON without writing", async () => {
 test("print targets exit 0 and write nothing", async () => {
   for (const agent of ["opencode", "aider", "generic"]) {
     const projectDir = tempProject();
-    const r = await run(["init", agent, "--project", projectDir]);
+    // opencode also bootstraps a memory tree — keep it out of the real home.
+    const r = await run(["init", agent, "--project", projectDir], {
+      env: { MEMENTO_MEMORY_ROOT: mkdtempSync(join(tmpdir(), "memento-init5-root-")) },
+    });
     assert.equal(r.code, 0, agent);
     assert.ok(r.stdout.length > 0, agent);
     assert.deepEqual(readdirSync(projectDir), [], `${agent} wrote files`);
@@ -147,7 +150,9 @@ test("aider printout contains the abs index path", async () => {
 
 test("opencode printout uses valid plugin config forms", async () => {
   const projectDir = tempProject();
-  const r = await run(["init", "opencode", "--project", projectDir]);
+  const r = await run(["init", "opencode", "--project", projectDir], {
+    env: { MEMENTO_MEMORY_ROOT: mkdtempSync(join(tmpdir(), "memento-init5-opc-")) },
+  });
   assert.equal(r.code, 0);
   // V1 (1.18.x) validates `plugin` as an array. V2 (2.x) ignores
   // project-level plugin entries entirely — plugins install globally.
