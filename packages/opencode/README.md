@@ -2,7 +2,9 @@
 
 Amnesia insurance for OpenCode: injects your project's Markdown memory index
 into session compaction, so auto-summarization never forgets that memory
-exists. Zero dependencies.
+exists. One dependency: the family's
+[@leonard-memento/core](https://www.npmjs.com/package/@leonard-memento/core)
+(itself zero-dependency).
 
 Part of the [leonard-memento](https://github.com/NemeZZiZZ/leonard-memento)
 family — the same curated memory index can be carried across every supported
@@ -84,8 +86,9 @@ a gap:
   Injection rides the `context` and `compaction` hooks, so it fires
   whether or not the model remembers that memory exists — there is no
   race to lose.
-- Zero dependencies is the point: no embedding model, no vector store,
-  nothing to initialize. Plain `node:fs`.
+- No moving parts is the point: no embedding model, no vector store,
+  nothing to initialize. Plain `node:fs` — the single dependency is the
+  family's own core package.
 - After injection the agent opens fact files by their absolute paths with
   its normal `read` tool — enough for recall without a custom tool.
 - Semantic search over memory is a separate job. Pair memento with a
