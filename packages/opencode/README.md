@@ -34,6 +34,13 @@ repository share the main checkout's memory tree.
 Restart OpenCode. The plugin injects the project's memory index into every
 provider request (and at compaction), so it survives summarization.
 
+**Clean install:** that's the whole setup. On the first plugin load in a
+project that has no memory tree yet, the plugin creates a starter index at
+`<memory root>/<project hash>/MEMORY.md` — an instruction stub the agent
+replaces with real entries as it works — and logs one line to the server
+log. Existing indexes are never touched. `memento init opencode` creates
+the same starter from the CLI.
+
 ## Configuration
 
 Plugin options in `opencode.json`, or environment variables everywhere.
@@ -66,10 +73,12 @@ sibling fact files carrying front-matter (`name`, `description`, `type`,
 dates). Curate it yourself — the plugin only guarantees it survives
 compaction.
 
-## Design: no tools, no writes
+## Design: no tools, no capture
 
 The plugin registers no tools and never calls the `memory` tool of other
-plugins. That is the design, not a gap:
+plugins, and it never writes on behalf of the model — the only write is
+the one-time starter index from a clean install. That is the design, not
+a gap:
 
 - A tool the model may skip is exactly the hole memento exists to plug.
   Injection rides the `context` and `compaction` hooks, so it fires
@@ -108,4 +117,6 @@ plugins. That is the design, not a gap:
 
 Upgrade the package and nothing else: your memory tree at
 `~/.config/opencode/memento/projects` keeps resolving via the fallback
-chain. Silent no-op when no index exists, exactly as before.
+chain. A missing index is no longer a silent no-op: the first load now
+creates a starter index and logs one line; an existing tree is never
+modified.

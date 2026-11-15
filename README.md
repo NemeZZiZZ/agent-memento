@@ -44,7 +44,7 @@ memento init <agent>
 
 | Agent | `memento init` target | Mechanism |
 |---|---|---|
-| OpenCode | `opencode` | prints the `opencode.json` plugin config (pattern A: compaction hook) |
+| OpenCode | `opencode` | prints the `opencode.json` plugin config and creates the starter index (pattern A: compaction hook) |
 | Claude Code | `claude-code` | writes a `SessionStart`/`compact` hook into `.claude/settings.json` (pattern A) |
 | Codex CLI | `codex` | writes a `SessionStart`/`^compact$` hook into `.codex/hooks.json` (pattern A) |
 | Gemini CLI | `gemini` | `GEMINI.md` `@<index-path>` import line |
@@ -61,6 +61,8 @@ memento init <agent>
 | Anything else | `generic` | prints the snippet to paste yourself |
 
 All snippet targets are idempotent (marker comments `<!-- memento:begin/end -->`) and never touch content outside their block. `memento init --list` shows what this build supports.
+
+On OpenCode 2.x / OpenChamber a clean `opencode plugin add opencode-memento` is self-bootstrapping: on the first plugin load in a project without a memory tree, the plugin creates the starter `MEMORY.md` itself and logs one line — no CLI step needed. `memento init opencode` does the same from the terminal and prints the 1.x config.
 
 ## The memory convention
 

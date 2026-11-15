@@ -25,6 +25,10 @@ memento init --list             # supported agents
 - `readProjectIndex(directory, options?)` — the frozen injection block, or
   `null` when the project has no memory yet.
 - `resolveMemoryRoot(overrides?)` — effective memory root; never throws.
+- `bootstrapProjectIndex(directory, options?)` — create the starter index if
+  the project has none (write-once: `'wx'` flag, existing file → `created:
+  false`, never overwrites); returns `{ created, indexPath }`.
+- `STARTER_INDEX` — the starter index content the bootstrap writes.
 - `initAgent(projectDir, agent)` / `TARGETS` — the init machinery.
 
 Options and their env fallbacks: `memoryRoot` / `MEMENTO_MEMORY_ROOT`,
