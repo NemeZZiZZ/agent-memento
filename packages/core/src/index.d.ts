@@ -49,6 +49,24 @@ export function memoryIndexPath(directory: string, options?: MemoryOptions): str
  */
 export function readProjectIndex(directory: string, options?: MemoryOptions): Promise<string | null>;
 
+/** The starter memory index bootstrapProjectIndex writes (agent-facing, English). */
+export const STARTER_INDEX: string;
+
+export interface BootstrapResult {
+  /** True when this call created the starter index; false when one already existed. */
+  created: boolean;
+  /** Absolute path of the project's index file. */
+  indexPath: string;
+}
+
+/**
+ * Create the starter memory index for a project when absent (write-once,
+ * 'wx': an existing index is never modified, empty ones included).
+ * Throws like memoryIndexPath on invalid configuration; rethrows
+ * filesystem errors (EACCES, or a non-file in the index path's way).
+ */
+export function bootstrapProjectIndex(directory: string, options?: MemoryOptions): BootstrapResult;
+
 /** Claude Code's project folder slug: the canonical path with separators as dashes. */
 export function claudeProjectSlug(projectDir: string): string;
 
@@ -99,6 +117,8 @@ export interface InitTarget {
   snippet?: (projectDir: string) => string;
   /** Present on `kind: "json"` targets: the hook entry merged into the JSON file. */
   jsonHook?: { matcher: string; command: string; filter: string };
+  /** Present on targets whose init also creates the starter memory index (opencode). */
+  bootstrap?: boolean;
   hint: string;
 }
 
@@ -117,7 +137,8 @@ export type MementoErrorCode =
   | "NOT_WRITABLE"
   | "INVALID_JSON"
   | "INVALID_JSON_SHAPE"
-  | "UNPAIRED_MARKER";
+  | "UNPAIRED_MARKER"
+  | "BOOTSTRAP_FAILED";
 
 export class MementoError extends Error {
   code: MementoErrorCode;
@@ -127,7 +148,8 @@ export class MementoError extends Error {
  * Idempotent setup of the memory-index integration for one agent.
  * Throws MementoError: UNKNOWN_AGENT, NOT_WRITABLE, INVALID_JSON (unparsable),
  * INVALID_JSON_SHAPE (root or `hooks` is not an object), UNPAIRED_MARKER
- * (a stray begin/end marker in the rules file — fixed by hand, never appended to).
+ * (a stray begin/end marker in the rules file — fixed by hand, never appended to),
+ * BOOTSTRAP_FAILED (a bootstrap-enabled target could not create the starter index).
  * Writes are atomic (temp file + rename), follow symlinked targets and keep the mode.
  */
 export function initAgent(projectDir: string, agent: string): InitResult;
