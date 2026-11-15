@@ -1,13 +1,13 @@
-# leonard-memento
+# agent-memento
 
-[![npm](https://img.shields.io/npm/v/@leonard-memento/core?label=%40leonard-memento%2Fcore)](https://www.npmjs.com/package/@leonard-memento/core)
+[![npm](https://img.shields.io/npm/v/agent-memento?label=agent-memento)](https://www.npmjs.com/package/agent-memento)
 [![npm](https://img.shields.io/npm/v/opencode-memento?label=opencode-memento)](https://www.npmjs.com/package/opencode-memento)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![Node](https://img.shields.io/badge/node-%E2%89%A520-brightgreen)](https://github.com/NemeZZiZZ/leonard-memento)
+[![Node](https://img.shields.io/badge/node-%E2%89%A520-brightgreen)](https://github.com/NemeZZiZZ/agent-memento)
 
 **Amnesia insurance for your coding agents.**
 
-When a coding agent compacts its context, the summarizer keeps only what it is shown — everything else evaporates. `leonard-memento` is a family of zero-dependency adapters that puts your project's curated Markdown memory index back in at that exact moment, in whatever agent you run: Total Recall, no trip to Rekall required.
+When a coding agent compacts its context, the summarizer keeps only what it is shown — everything else evaporates. `agent-memento` is a family of adapters (zero third-party dependencies) that puts your project's curated Markdown memory index back in at that exact moment, in whatever agent you run: Total Recall, no trip to Rekall required.
 
 > "Now, where was I?" — Leonard, *Memento*
 
@@ -17,7 +17,7 @@ It is deliberately **not** a memory system: no capture, no retrieval, no LLM cal
 
 ## Why not a memory system?
 
-| | agentmemory / claude-mem / mem0 | **leonard-memento** |
+| | agentmemory / claude-mem / mem0 | **agent-memento** |
 |---|---|---|
 | What it is | memory system: capture, storage, retrieval, consolidation | compaction-boundary insurance |
 | Content | auto-observations, LLM compression | curated index: one line per fact, maintained by you |
@@ -30,7 +30,7 @@ It is deliberately **not** a memory system: no capture, no retrieval, no LLM cal
 
 | Package | npm | What it is |
 |---|---|---|
-| `packages/core` | `@leonard-memento/core` | Shared logic + the `memento` CLI |
+| `packages/core` | `agent-memento` | Shared logic + the `memento` CLI |
 | `packages/opencode` | `opencode-memento` | OpenCode plugin (V1 + V2), continuity of v1.0.0 |
 | `packages/claude-code` | `claude-code-memento` | Claude Code plugin (`SessionStart` × `compact` hook) |
 | `packages/codex` | `codex-memento` | Codex CLI plugin (`SessionStart` × `compact` hook) |
@@ -38,7 +38,7 @@ It is deliberately **not** a memory system: no capture, no retrieval, no LLM cal
 ## Install
 
 ```
-npm i -g @leonard-memento/core
+npm i -g agent-memento
 memento init <agent>
 ```
 
@@ -85,7 +85,7 @@ memento init <agent>            # idempotent setup
 memento init --list             # supported agents
 memento sync claude [--project DIR] [--dry-run] [--claude-dir DIR]
                                  # share facts with Claude Code auto memory, both ways
-                                 # (@leonard-memento/core >= 0.2.1)
+                                 # (agent-memento >= 0.2.1)
 ```
 
 Environment: `MEMENTO_MEMORY_ROOT` overrides the root; `MEMENTO_INDEX_FILE` overrides the index file name. On Windows, hook commands resolve through npm's `.cmd` shims (keep the global npm bin directory on `PATH`); sync and the rest of the CLI are path-separator safe.

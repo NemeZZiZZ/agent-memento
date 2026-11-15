@@ -1,6 +1,6 @@
 # Compatibility and guarantees
 
-What `leonard-memento` promises, how much of that is machine-checked, and what remains manual. Read this as a contract: if CI or a future release ever breaks something listed here, that is a bug.
+What `agent-memento` promises, how much of that is machine-checked, and what remains manual. Read this as a contract: if CI or a future release ever breaks something listed here, that is a bug.
 
 ## The guarantees
 
@@ -52,7 +52,7 @@ Run this before every release (roughly 15 minutes):
 - [ ] **Codex CLI**: `memento init codex`, run a compacting session; block re-injected.
 - [ ] **`memento sync claude`**: run twice against a real `~/.claude/projects/<slug>/memory/`; second run reports all `in sync`; no file deleted on either side.
 - [ ] **Snippet spot-check** (one per release, rotate): confirm the target file loads in the agent (e.g. Cursor `.cursor/rules/memento.mdc`, Gemini `GEMINI.md` import) and that re-running `init` changes nothing.
-- [ ] **Fresh machine**: `npm i -g @leonard-memento/core && memento init <agent>` on a clean profile; no preconditions beyond Node ≥ 20.
+- [ ] **Fresh machine**: `npm i -g agent-memento && memento init <agent>` on a clean profile; no preconditions beyond Node ≥ 20.
 
 ## Support policy
 

@@ -2,7 +2,7 @@
 
 **Amnesia insurance for Codex CLI.**
 
-Part of the [leonard-memento](https://github.com/NemeZZiZZ/leonard-memento)
+Part of the [agent-memento](https://github.com/NemeZZiZZ/agent-memento)
 family.
 
 ## How it works
@@ -16,7 +16,7 @@ index is back in context immediately after compaction.
 ## Install
 
 ```
-npm i -g @leonard-memento/core codex-memento
+npm i -g agent-memento codex-memento
 memento init codex
 ```
 

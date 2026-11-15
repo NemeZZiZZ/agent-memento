@@ -3,10 +3,10 @@
 Amnesia insurance for OpenCode: injects your project's Markdown memory index
 into session compaction, so auto-summarization never forgets that memory
 exists. One dependency: the family's
-[@leonard-memento/core](https://www.npmjs.com/package/@leonard-memento/core)
+[agent-memento](https://www.npmjs.com/package/agent-memento)
 (itself zero-dependency).
 
-Part of the [leonard-memento](https://github.com/NemeZZiZZ/leonard-memento)
+Part of the [agent-memento](https://github.com/NemeZZiZZ/agent-memento)
 family — the same curated memory index can be carried across every supported
 coding agent.
 

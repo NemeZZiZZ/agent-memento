@@ -1,6 +1,6 @@
-# Agent memory, compared: where leonard-memento fits
+# Agent memory, compared: where agent-memento fits
 
-The agent-memory market loudly rewards auto-magic: [claude-mem](https://github.com/thedotmack/claude-mem) sits at 109,043 GitHub stars with [78,676 npm downloads a month](https://api.npmjs.org/downloads/point/last-month/claude-mem), and [mem0](https://github.com/mem0ai/mem0) at 68,236 (counts verified 2026-11-01). The issue trackers of those same projects quietly document what automatic capture costs: contradictory facts that accumulate by design, memories that vanish with a warning instead of an error, deleted memories that come back. `leonard-memento` is deterministic insurance beside those tools, not a replacement for them: a hand-curated Markdown index injected into context at session start and again at the compaction boundary — no capture, no retrieval, no LLM calls, zero dependencies. This page compares the approaches honestly: what ~30 facts cost each one, which failure modes are documented where, and where each tool plainly wins. Every criticism below is sourced to the tool's own issue tracker or documentation.
+The agent-memory market loudly rewards auto-magic: [claude-mem](https://github.com/thedotmack/claude-mem) sits at 109,043 GitHub stars with [78,676 npm downloads a month](https://api.npmjs.org/downloads/point/last-month/claude-mem), and [mem0](https://github.com/mem0ai/mem0) at 68,236 (counts verified 2026-11-01). The issue trackers of those same projects quietly document what automatic capture costs: contradictory facts that accumulate by design, memories that vanish with a warning instead of an error, deleted memories that come back. `agent-memento` is deterministic insurance beside those tools, not a replacement for them: a hand-curated Markdown index injected into context at session start and again at the compaction boundary — no capture, no retrieval, no LLM calls, zero dependencies. This page compares the approaches honestly: what ~30 facts cost each one, which failure modes are documented where, and where each tool plainly wins. Every criticism below is sourced to the tool's own issue tracker or documentation.
 
 *Method note: token figures are estimates — characters ÷ 4, the usual back-of-envelope for English text under BPE tokenizers; real counts vary by tokenizer. The memento figure is exact arithmetic on the sample index below, using the same wrapper its injection code emits. All external facts were verified against primary sources on 2026-11-01; star counts and release activity move.*
 
@@ -53,7 +53,7 @@ On disk that is 1,824 bytes: a header line, a blank line, and 30 fact lines aver
 (Long-term memory: preserve these entries in the summary; individual fact files stay readable at their paths.)
 ```
 
-Header (85 chars) + index (1,823 chars after trimming the trailing newline) + footer (110 chars) + line breaks = 2,022 characters, ÷ 4 ≈ **505 tokens** — the entire cost of having all 30 facts in context, paid again at each compaction, with zero tool calls. A long session with three compactions pays it four times (start + 3): ≈ 2,020 tokens total for a memory that never leaves the room. The wrapper is emitted verbatim by [`readProjectIndex`](https://github.com/NemeZZiZZ/leonard-memento/blob/main/packages/core/src/read.mjs), so the arithmetic matches the code that ships.
+Header (85 chars) + index (1,823 chars after trimming the trailing newline) + footer (110 chars) + line breaks = 2,022 characters, ÷ 4 ≈ **505 tokens** — the entire cost of having all 30 facts in context, paid again at each compaction, with zero tool calls. A long session with three compactions pays it four times (start + 3): ≈ 2,020 tokens total for a memory that never leaves the room. The wrapper is emitted verbatim by [`readProjectIndex`](https://github.com/NemeZZiZZ/agent-memento/blob/main/packages/core/src/read.mjs), so the arithmetic matches the code that ships.
 
 The four tools below charge on different meters:
 
@@ -64,7 +64,7 @@ The four tools below charge on different meters:
 
 | Tool | How 30 facts reach the model | The math (estimate) | Budget for ~30 facts |
 |---|---|---|---|
-| **leonard-memento** | whole index block injected at session start and again at each compaction | 2,022 chars ÷ 4, computed above from the exact injection format | ~505 tokens, fixed; no calls, no retrieval |
+| **agent-memento** | whole index block injected at session start and again at each compaction | 2,022 chars ÷ 4, computed above from the exact injection format | ~505 tokens, fixed; no calls, no retrieval |
 | [Claude Code native](https://code.claude.com/docs/en/memory) | "[The first 200 lines of MEMORY.md, or the first 25KB](https://code.claude.com/docs/en/memory)… are loaded at the start of every conversation" | same 30 lines = 1,807 chars, far under both caps, ÷ 4 | ~450 tokens at conversation start; a full 200-line / 25KB index would be ~3,000–6,400 tokens |
 | [mem0](https://github.com/mem0ai/mem0) | nothing is injected; each `memory.search(query, top_k)` returns up to `top_k` memories, and [the application decides what enters the prompt](https://github.com/mem0ai/mem0/blob/main/README.md) | a stored memory is roughly one sentence (~80–120 chars ≈ 20–30 tokens, estimate); × `top_k`, × per query; capture adds [one LLM extraction call per `add`](https://github.com/mem0ai/mem0/blob/main/README.md) | ~0 until the first search, then unbounded: 30 facts need `top_k ≥ 30` in one query or several searches — every session |
 | [claude-mem](https://github.com/thedotmack/claude-mem) | SessionStart injection of a [count-capped slice of observations](https://github.com/thedotmack/claude-mem/blob/main/README.md), plus MCP `search` / `timeline` / `get_observations` calls on demand | no token budget is documented; cost scales with the observation cap and the number of MCP searches; the [README claims ~10x savings](https://github.com/thedotmack/claude-mem/blob/main/README.md) for its 3-layer workflow | not fixed; and the default SessionStart injection [excludes other harnesses' observations](https://github.com/thedotmack/claude-mem/blob/main/README.md) — a gap for multi-agent directories |
@@ -77,7 +77,7 @@ One more data point from the math: memento's 30-fact index (1,807 chars of facts
 
 Ground rules for this section: criticism is only admissible from each project's own tracker or docs, and cells marked "—" mean no documented case was found in the sources examined — not that none can ever exist. Where a failure is inherent to an architecture rather than a bug, the cell says so and links the architecture's own description.
 
-| Failure mode | mem0 | claude-mem | Claude Code native auto memory | leonard-memento |
+| Failure mode | mem0 | claude-mem | Claude Code native auto memory | agent-memento |
 |---|---|---|---|---|
 | **Memory pollution / stale contradictory facts** | Documented: ADD-only extraction accumulates "I work at A" alongside "I work at B" ([#4956](https://github.com/mem0ai/mem0/issues/4956)); 54-comment community "temporal hygiene" cron workaround for "memory pollution" ([#5352](https://github.com/mem0ai/mem0/issues/5352); related asks closed as *not planned*) | — | Auto-curated index; the [docs](https://code.claude.com/docs/en/memory) describe loading caps but no review or expiry step | Not structurally impossible — a human can let a line go stale. But nothing enters the index except an edit, and the entire state is 30 visible lines |
 | **Silent memory loss** | Documented: partial batch-embedding failure drops facts with only a WARNING, no exception ([#5245](https://github.com/mem0ai/mem0/issues/5245), P1-high, accepted) | — | — | Structurally impossible per-fact: injection is one file read, byte-identical to `MEMORY.md`. A missing file is silent by design — whole-block absence you can check with `ls`, not one fact vanishing among thousands |
@@ -104,7 +104,7 @@ If a tool does a job better than memento, this page loses credibility by hiding 
 - **[Basic Memory](https://github.com/basicmachines-co/basic-memory)** — structured knowledge plus its own pre-compaction checkpoints: Markdown entities/observations/relations (Obsidian-compatible) indexed by SQLite + FastEmbed, `bm_*` MCP tools, session-start briefings and pre-compaction checkpoints via its Claude Code plugin. The closest philosophical cousin — at the cost of a Python/uv + MCP stack and an optional $15/mo cloud.
 - **[server-memory](https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md) (MCP reference)** — the universal scratchpad: a JSONL knowledge graph any MCP client can use, no install beyond `npx`. Its README's example prompt has to script the model to say "Remembering…" — the purest illustration that tool-call memory depends on the model remembering to remember.
 - **[mcp-memory-service](https://github.com/doobidoo/mcp-memory-service)** — a full local memory backend: SQLite + sqlite-vec with local ONNX embeddings ("memory never leaves your infrastructure"), hybrid search ranked by recency/frequency, its own benchmark page. What a determined solo maintainer can build — and a single-maintainer bus factor is the trade.
-- **leonard-memento** — determinism, zero deps, the compaction boundary, cross-agent, auditability: a byte-identical injected block, 0 npm dependencies, re-injection at compaction on OpenCode, Claude Code, and Codex first-class (plus 12 snippet targets), one path-hash-keyed tree shared by every agent working in the directory, and a memory you audit with `grep` instead of a SQLite/Chroma pair behind a viewer.
+- **agent-memento** — determinism, zero third-party deps, the compaction boundary, cross-agent, auditability: a byte-identical injected block, no third-party npm dependencies, re-injection at compaction on OpenCode, Claude Code, and Codex first-class (plus 12 snippet targets), one path-hash-keyed tree shared by every agent working in the directory, and a memory you audit with `grep` instead of a SQLite/Chroma pair behind a viewer.
 
 ### Hardening (v0.2.1)
 
@@ -128,7 +128,7 @@ Ported from a competitive analysis verified 2026-11-01 against the GitHub API, t
 | [Claude Code native](https://code.claude.com/docs/en/memory) | n/a | auto (auto memory) + manual CLAUDE.md | `~/.claude/projects/<p>/memory/` `MEMORY.md` + topic files | first 200 lines/25KB always | session start | none (built in) | machine-local | Claude Code only |
 | [Anthropic memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) | n/a | model writes `/memories` | your storage (client-side handler) | model tool calls ("view first" prompt) | on tool call | your app implements handler | yours | Claude API/apps |
 | [AGENTS.md convention](https://agents.md/) | 60k+ repos | human-edited | Markdown in repo | always loaded | session start | none | in-repo | Codex, OpenCode, Cursor, Gemini, Zed, VS Code, Warp, ~20 tools |
-| [leonard-memento](../README.md) | (new) | **curated by human** | flat Markdown outside repo | **always-injected block** | **session start + compaction boundary** | **0 deps, no runtime** | local | OpenCode, Claude Code, Codex + 12 snippet targets |
+| [agent-memento](../README.md) | (new) | **curated by human** | flat Markdown outside repo | **always-injected block** | **session start + compaction boundary** | **0 deps, no runtime** | local | OpenCode, Claude Code, Codex + 12 snippet targets |
 
 ## Choose by the failure mode you cannot tolerate
 
@@ -142,7 +142,7 @@ Ported from a competitive analysis verified 2026-11-01 against the GitHub API, t
 memento sits beside these tools rather than replacing them. It captures nothing and retrieves nothing; it guarantees that the ~30 lines you curate are present when the summarizer runs — in whichever of the 15 agents you use. Because it is one file read at two moments and nothing else, it does not conflict with a memory system running alongside it: the auto-magic tool can handle recall breadth, memento holds the floor. Insurance, not a memory system.
 
 ```
-npm i -g @leonard-memento/core
+npm i -g agent-memento
 memento init <agent>
 ```
 
@@ -152,4 +152,4 @@ Leonard's tattoos worked because they were deterministic. So is this.
 
 ---
 
-*Caveats: this page is a snapshot written 2026-11-01; star counts, downloads, and issue statuses move. Issue links point at each project's own tracker — where a bug is fixed after this date, the link will say so. Token figures are chars ÷ 4 estimates as stated above; the memento figure is exact arithmetic on the sample index and the frozen injection format, but your tokenizer will differ. Corrections welcome via the [issue tracker](https://github.com/NemeZZiZZ/leonard-memento/issues).*
+*Caveats: this page is a snapshot written 2026-11-01; star counts, downloads, and issue statuses move. Issue links point at each project's own tracker — where a bug is fixed after this date, the link will say so. Token figures are chars ÷ 4 estimates as stated above; the memento figure is exact arithmetic on the sample index and the frozen injection format, but your tokenizer will differ. Corrections welcome via the [issue tracker](https://github.com/NemeZZiZZ/agent-memento/issues).*

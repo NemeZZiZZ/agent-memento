@@ -1,7 +1,7 @@
 {
   "name": "claude-code-memento",
   "version": "1.3.0",
-  "description": "Amnesia insurance for Claude Code: injects your project's Markdown memory index into context compaction, so auto-summarization never forgets that memory exists. Zero dependencies.",
+  "description": "Amnesia insurance for Claude Code: injects your project's Markdown memory index into context compaction, so auto-summarization never forgets that memory exists. One dependency: the family's agent-memento engine.",
   "license": "MIT",
   "type": "module",
   "author": "NemeZZiZZ",

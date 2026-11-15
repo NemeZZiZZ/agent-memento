@@ -2,7 +2,7 @@
 
 **Amnesia insurance for Claude Code.**
 
-Part of the [leonard-memento](https://github.com/NemeZZiZZ/leonard-memento)
+Part of the [agent-memento](https://github.com/NemeZZiZZ/agent-memento)
 family.
 
 ## How it works
@@ -17,13 +17,13 @@ immediately after compaction.
 **Plugin (recommended):**
 
 ```
-/plugin install NemeZZiZZ/leonard-memento
+/plugin install NemeZZiZZ/agent-memento
 ```
 
 **Manual (repo-local):**
 
 ```
-npm i -g @leonard-memento/core claude-code-memento
+npm i -g agent-memento claude-code-memento
 memento init claude-code
 ```
 

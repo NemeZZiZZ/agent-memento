@@ -1,10 +1,10 @@
 # Claude Code interop
 
-Claude Code ships with [native auto memory](https://code.claude.com/docs/en/memory): a `MEMORY.md` index plus topic files, one tree per project, curated by Claude as it works. `leonard-memento` uses the same convention on purpose — which means the two coexist, and `memento sync claude` keeps them in step. This page explains where each side lives, what sync does and never does, and what memento adds on top of native memory.
+Claude Code ships with [native auto memory](https://code.claude.com/docs/en/memory): a `MEMORY.md` index plus topic files, one tree per project, curated by Claude as it works. `agent-memento` uses the same convention on purpose — which means the two coexist, and `memento sync claude` keeps them in step. This page explains where each side lives, what sync does and never does, and what memento adds on top of native memory.
 
 ## Where each side lives
 
-| | Claude Code native auto memory | leonard-memento |
+| | Claude Code native auto memory | agent-memento |
 |---|---|---|
 | Root | `~/.claude/projects/<slug>/memory/` | `~/.config/memento/projects/<hash16>/` |
 | Index | `MEMORY.md` — first 200 lines / 25KB loaded at conversation start | `MEMORY.md` — whole injection block at session start **and at every compaction** |

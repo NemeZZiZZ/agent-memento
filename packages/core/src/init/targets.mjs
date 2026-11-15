@@ -106,7 +106,7 @@ export const TARGETS = {
     kind: "json",
     file: (p) => join(p, ".claude", "settings.json"),
     jsonHook: { matcher: "compact", command: "claude-code-memento hook", filter: "claude-code-memento" },
-    hint: "Restart Claude Code, then run /compact once — the index block should reappear. (Plugin alternative: /plugin install NemeZZiZZ/leonard-memento)",
+    hint: "Restart Claude Code, then run /compact once — the index block should reappear. (Plugin alternative: /plugin install NemeZZiZZ/agent-memento)",
   },
   codex: {
     kind: "json",

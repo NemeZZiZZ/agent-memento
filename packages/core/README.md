@@ -1,10 +1,10 @@
-# @leonard-memento/core
+# agent-memento
 
 Amnesia insurance for coding agents: a curated, Markdown project memory index
 injected into context compaction, so auto-summarization never forgets that
 memory exists. Zero dependencies.
 
-Part of the [leonard-memento](https://github.com/NemeZZiZZ/leonard-memento)
+Part of the [agent-memento](https://github.com/NemeZZiZZ/agent-memento)
 family — this package carries the shared logic and the `memento` CLI; the
 per-agent plugins build on it.
 
