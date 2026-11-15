@@ -19,8 +19,12 @@
 //
 // Every hook body is wrapped in try/catch: a failing memory lookup must
 // never break a compaction or a session.
+//
+// On load, the plugin also creates the project's starter memory index
+// (agent-facing instructions) when the project has none — clean installs
+// become usable with zero terminal steps. Create-only, never overwrites.
 
-import { readProjectIndex } from "@leonard-memento/core";
+import { readProjectIndex, bootstrapProjectIndex } from "@leonard-memento/core";
 
 /**
  * @typedef {Object} MementoOptions
@@ -30,6 +34,7 @@ import { readProjectIndex } from "@leonard-memento/core";
  *   ~/.config/opencode/memento/projects (still honored).
  * @property {string} [indexFile] - Index file name inside a project's
  *   memory directory. Default: MEMORY.md (env fallback: MEMENTO_INDEX_FILE).
+ *   These options feed both the bootstrap and the read path identically.
  */
 
 /**
@@ -38,6 +43,21 @@ import { readProjectIndex } from "@leonard-memento/core";
  */
 function optionsFrom(value) {
   return value && typeof value === "object" ? value : {};
+}
+
+/**
+ * Create the project's starter memory index when absent (clean installs).
+ * Same options as the read path; one console line per creation — the
+ * plugin API has no logger, and console output lands in the server log.
+ */
+function bootstrapQuietly(directory, options) {
+  try {
+    const r = bootstrapProjectIndex(directory, options);
+    if (r.created) console.log(`opencode-memento: created starter memory index at ${r.indexPath}`);
+  } catch {
+    // A failing bootstrap must never break a session — worst case the
+    // hook stays silent, exactly like a missing index before this feature.
+  }
 }
 
 /**
@@ -55,6 +75,7 @@ function optionsFrom(value) {
  */
 export const MementoPlugin = async (input, options) => {
   const resolved = optionsFrom(options);
+  bootstrapQuietly(input?.directory, resolved);
   return {
     "experimental.session.compacting": async (_input, output) => {
       try {
@@ -73,6 +94,7 @@ export default {
   async setup(ctx) {
     const options = optionsFrom(ctx.options);
     const projectDir = ctx.location.project?.canonical ?? ctx.location.directory;
+    bootstrapQuietly(projectDir, options);
     // V2 idiom (verified live on OpenChamber 2.0.20 against working plugins):
     // register the SAME callback for "context" and "compaction", pushing
     // into event.system. The "context" hook fires on every provider request,

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -76,10 +76,52 @@ test("both context and compaction hooks inject the same frozen block", async () 
   }
 });
 
-test("hook is silent without index", async () => {
+test("setup bootstraps a starter index into an empty root", async (t) => {
+  t.mock.method(console, "log", () => {});
   const memoryRoot = mkdtempSync(join(tmpdir(), "memento-opc-empty-"));
   const { captured, ctx } = fakeV2Context({ options: { memoryRoot } });
   await plugin.setup(ctx);
+  assert.equal(existsSync(join(memoryRoot, projectHash("/real"), "MEMORY.md")), true);
+  const event = { system: [] };
+  await captured.cb(event);
+  const expected = await readProjectIndex("/real", { memoryRoot });
+  assert.deepEqual(event.system, [{ type: "text", text: expected }]);
+});
+
+test("setup logs once when creating the starter", async (t) => {
+  const memoryRoot = mkdtempSync(join(tmpdir(), "memento-opc-log-"));
+  const log = t.mock.method(console, "log", () => {});
+  try {
+    const { ctx } = fakeV2Context({ options: { memoryRoot } });
+    await plugin.setup(ctx);
+    assert.equal(log.mock.callCount(), 1);
+    const line = log.mock.calls[0].arguments.join(" ");
+    assert.equal(line.includes("created starter memory index at"), true);
+    assert.equal(line.includes(join(memoryRoot, projectHash("/real"), "MEMORY.md")), true);
+  } finally {
+    t.mock.restoreAll();
+  }
+});
+
+test("second setup does not rewrite an edited index", async (t) => {
+  const log = t.mock.method(console, "log", () => {});
+  const memoryRoot = mkdtempSync(join(tmpdir(), "memento-opc-twice-"));
+  const { ctx } = fakeV2Context({ options: { memoryRoot } });
+  await plugin.setup(ctx);
+  const indexPath = join(memoryRoot, projectHash("/real"), "MEMORY.md");
+  writeFileSync(indexPath, "- [[mine]] — hand-written\n");
+  await plugin.setup(ctx);
+  assert.equal(readFileSync(indexPath, "utf8"), "- [[mine]] — hand-written\n");
+  assert.equal(log.mock.callCount(), 1);
+});
+
+test("setup never throws when bootstrap fails", async (t) => {
+  t.mock.method(console, "log", () => {});
+  const memoryRoot = mkdtempSync(join(tmpdir(), "memento-opc-broken-"));
+  const { captured, ctx, hooks } = fakeV2Context({ options: { memoryRoot } });
+  mkdirSync(join(memoryRoot, projectHash("/real"), "MEMORY.md"), { recursive: true });
+  await plugin.setup(ctx);
+  assert.equal(hooks.length, 2);
   const event = { system: [] };
   await captured.cb(event);
   assert.deepEqual(event.system, []);
@@ -127,14 +169,17 @@ test("v1 server pushes the index into output.context", async () => {
   }
 });
 
-test("v1 server is silent without index", async () => {
+test("v1 server bootstraps a starter index into an empty root", async (t) => {
+  t.mock.method(console, "log", () => {});
   const memoryRoot = mkdtempSync(join(tmpdir(), "memento-opc-v1empty-"));
   process.env.MEMENTO_MEMORY_ROOT = memoryRoot;
   try {
     const hooks = await plugin.server({ directory: "/v1proj" });
+    assert.equal(existsSync(join(memoryRoot, projectHash("/v1proj"), "MEMORY.md")), true);
     const output = { context: [] };
     await hooks["experimental.session.compacting"](null, output);
-    assert.deepEqual(output.context, []);
+    const expected = await readProjectIndex("/v1proj", { memoryRoot });
+    assert.deepEqual(output.context, [expected]);
   } finally {
     delete process.env.MEMENTO_MEMORY_ROOT;
   }
@@ -208,12 +253,14 @@ test("v1 named export accepts tuple options as second argument", async () => {
   assert.equal(output.context.length, 1);
 });
 
-test("v1 named export is silent without index", async () => {
+test("v1 named export bootstraps a starter index into an empty root", async (t) => {
+  t.mock.method(console, "log", () => {});
   const memoryRoot = mkdtempSync(join(tmpdir(), "memento-opc-v1fn-empty-"));
   const hooks = await adapter.MementoPlugin({ directory: "/v1proj" }, { memoryRoot });
+  assert.equal(existsSync(join(memoryRoot, projectHash("/v1proj"), "MEMORY.md")), true);
   const output = { context: [] };
   await hooks["experimental.session.compacting"](null, output);
-  assert.deepEqual(output.context, []);
+  assert.equal(output.context.length, 1);
 });
 
 test("v1 named export never throws on read failure", async () => {
